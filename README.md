@@ -105,7 +105,8 @@ Neural Network: 4 Hidden layers of 20 Neurons
 
 ## License
 
-This code is released under an open-source license, allowing users to modify, distribute, and use it freely.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 
 ## Acknowledgments
 
