@@ -1,4 +1,4 @@
-# n-Dimensional PDE solver using Physics-Informed Neural Networks (PINNs) /\ README
+# n-Dimensional PDE solver using Physics-Informed Neural Networks (PINNs) -> README
 
 **Author:** Marti JIMENEZ  
 **Date:** 01/08/2023  
@@ -9,9 +9,9 @@
 
 This repository contains a Python code to solve n-Dimensional Partial Differential Equations with Physics-Informed Neural Networks. The code leverages TensorFlow, an open-source deep learning library, to build and train the neural network. 
 
-Partial Differential Equations (PDEs) are fundamental in describing physical phenomena like fluid dynamics, heat conduction, and quantum mechanics. In medicine, PDEs are crucial for modeling tumor growth, drug diffusion, and biological processes. Solving complex, high-dimensional PDEs can be challenging, especially when analytical solutions are not feasible. This repository offers an efficient solution using Physics-Informed Neural Networks (PINNs) to solve n-dimensional medical PDEs.
+Partial Differential Equations (PDEs) are fundamental in describing physical phenomena like fluid dynamics, heat conduction, and quantum mechanics. In medicine, PDEs are crucial for modeling tumor growth, drug diffusion, and biological processes. Solving complex, high-dimensional PDEs can be challenging, especially when analytical solutions are not feasible. This repository offers an efficient solution using Physics-Informed Neural Networks (PINNs) to solve n-dimensional PDEs.
 
-Physics-Informed Neural Networks (PINNs) offer an innovative approach to solve PDEs. PINNs combine the flexibility and expressive power of neural networks with the physical constraints encoded in the PDEs to approximate the solutions efficiently. By incorporating physical principles, PINNs can achieve accurate and robust solutions without increasing the complexity exponentially for every dimension added in the PDE.
+PINNs can achieve accurate and robust solutions without increasing the complexity exponentially for every dimension added in the PDE like other methods (Finite Difference Method).
 
 
 
@@ -20,6 +20,8 @@ Physics-Informed Neural Networks (PINNs) offer an innovative approach to solve P
 As an example, we are solving the Fisher-KPP equation in 2 Dimensions:
 
 $\frac{\partial u}{\partial t} = D \left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right) + r \cdot u \cdot (1 - u)$
+
+with the Initial Condition $\exp{(-\frac{(x-0.5)^2+(y-0.5)^2}{0.08})}$ and the Neumann Boundary Condition: $\nabla u \cdot n = 0$
 
 where:
 - $u = u(t, x, y)$ represents the population density of the species at time $t$ and spatial coordinates $(x, y)$.
