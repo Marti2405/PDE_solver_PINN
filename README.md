@@ -96,11 +96,11 @@ The Fisher-KPP equation is commonly used to model the spread of an advantageous 
 ### Predicted Solution
 Neural Network: 4 Hidden layers of 20 Neurons
 
-![Fisher KPP 1](./FisherKpp1.png)
+![Fisher KPP 1](./images/FisherKpp1.png)
 
-![Fisher KPP 2](./FisherKpp2.png)
+![Fisher KPP 2](./images/FisherKpp2.png)
 
-![Fisher KPP 3](./FisherKpp3.png)
+![Fisher KPP 3](./images/FisherKpp3.png)
 
 
 ## License
