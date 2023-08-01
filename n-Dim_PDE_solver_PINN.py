@@ -1,20 +1,21 @@
-########################################################################
-## Author: Marti JIMENEZ
-## Date: 01/08/2023
-## Institution: INSA (National Institute of Applied Sciences) Toulouse, France
-## License: Open-source
-## 
-##
-## The code: 
-##              This code solves n-Dimensional Partial Differential Equations
-##              with Physics-Informed Neural Networks
-##
-##
-## Example:
-##              As an example we solved the Fisher-KPP equation in 2 Dimensions
-##
-##                      du/dt = D*( d²u/dx² + d²u/dy² ) + r*u*(1-u)
-########################################################################
+########################################################################################
+## Author: Marti JIMENEZ                                                              ##
+## Date: 01/08/2023                                                                   ##
+## Institution: INSA (National Institute of Applied Sciences) Toulouse, France        ##
+## License: Open-source                                                               ##
+##                                                                                    ##
+##                                                                                    ##
+## The code:                                                                          ##
+##              This code solves n-Dimensional Partial Differential Equations         ##
+##                          with Physics-Informed Neural Networks                     ##
+##                                                                                    ##
+##                                                                                    ##
+## Example:                                                                           ##
+##              As an example we solved the Fisher-KPP equation in 2 Dimensions       ##
+##                                                                                    ##
+##                      du/dt = D*( d²u/dx² + d²u/dy² ) + r*u*(1-u)                   ##
+##                                                                                    ##
+########################################################################################
 
 
 
