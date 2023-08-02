@@ -61,7 +61,7 @@ To use the code, follow these steps:
 
 2. Modify the DIMENSIONS, BOUNDARIES, and other configuration parameters as needed for your specific problem.
 
-3. Define the PDE and initial conditions in the `comp_r` and `comp_i` functions, respectively. Define the Neumann Boundary Condition by changing the NEUMANN_BOUNDARY_CONDITION variable.
+3. Define the PDE and initial conditions in the `comp_r` and `comp_i` functions, respectively. Define the Neumann Boundary Condition by changing the `NEUMANN_BOUNDARY_CONDITION` variable.
 
 4. Run the code to train the model.
 
