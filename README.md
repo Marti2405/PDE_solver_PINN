@@ -27,7 +27,7 @@ The code is organized into several sections, each serving a specific purpose. Be
 
 1. **Dimensions and Variable Boundaries:**
 
-   Specify the number of dimensions (DIMENSIONS) and the boundaries for each variable (BOUNDARIES).
+   Specify the number of dimensions (`DIMENSIONS`) and the boundaries for each variable (`BOUNDARIES`).
    
 2. **Define the PDE, Boundary Conditions, and Initial Conditions:** 
 
@@ -35,15 +35,15 @@ The code is organized into several sections, each serving a specific purpose. Be
 
 3. **Data Generation:**
 
-   Create the datasets for initial conditions (X_0), boundary conditions (X_b), and PDE collocation points (X_r).
+   Create the datasets for initial conditions (`X_0`), boundary conditions (`X_b`), and PDE collocation points (`X_r`).
 
 4. **Neural Network Configuration:**
 
-   Set up the neural network architecture using TensorFlow Keras. The code uses a feedforward neural network with a configurable number of hidden layers (NUMBER_HIDDEN_LAYERS) and neurons per layer (NUMBER_NEURONS_PER_LAYER). 
+   Set up the neural network architecture using TensorFlow Keras. The code uses a feedforward neural network with a configurable number of hidden layers (`NUMBER_HIDDEN_LAYERS`) and neurons per layer (`NUMBER_NEURONS_PER_LAYER`). 
 
 5. **Residuals and Loss Computation:**
 
-   Define functions to calculate the residuals of the PDE (comp_r), initial conditions (comp_i) and boundary conditions (comp_b) using TensorFlow automatic differentiation. The loss function (compute_loss) computes the mean squared error between the predicted and actual residuals.
+   Define functions to calculate the residuals of the PDE (`comp_r`), initial conditions (`comp_i`) and boundary conditions (`comp_b`) using TensorFlow automatic differentiation. The loss function (`compute_loss`) computes the mean squared error between the predicted and actual residuals.
 
 6. **Model Training:**
 
@@ -59,16 +59,16 @@ To use the code, follow these steps:
 
 1. Install the required dependencies (TensorFlow, NumPy, Matplotlib).
 
-2. Modify the DIMENSIONS, BOUNDARIES, and other configuration parameters as needed for your specific problem.
+2. Modify the `DIMENSIONS`, `BOUNDARIES`, and other configuration parameters as needed for your specific problem.
 
 3. Define the PDE and initial conditions in the `comp_r` and `comp_i` functions, respectively. Define the Neumann Boundary Condition by changing the `NEUMANN_BOUNDARY_CONDITION` variable.
 
 4. Run the code to train the model.
 
     
-   **The trained Neural Network will be saved as a .h5 file in the specified path (CHEKPOINT_PATH)**
+   **The trained Neural Network will be saved as a .h5 file in the specified path (`CHEKPOINT_PATH`)**
 
-5. You can then use model.predict() to predict the solution of the PDE at the given point. And you can load a saved model with model.load_weights(CHEKPOINT_PATH)
+5. You can then use `model.predict()` to predict the solution of the PDE at the given point. And you can load a saved model with `model.load_weights(CHEKPOINT_PATH)`
 
 ## Model Checkpoints
 
