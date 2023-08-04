@@ -89,13 +89,12 @@ NUMBER_DATA_POINTS_BOUNDARY_CONDITION = 1000
 
 ### Training Parameters
 
-Define the number of training epochs, learning rates, and at which epoch you want to change the learning rate. Set the interval to print the loss during training.
+Define the number of training epochs. Set the interval to print the loss during training. Set the PLOT_HISTORY_LOSS to true if you want to see the plot of the loss history after training.
 
 ```python
 NUMBER_TRAINING_EPOCHS = 20000
-LEARNING_RATE = [1e-2, 5e-3, 1e-3, 5e-4, 1e-4]
-EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [2000, 5000, 12500, 17500]
 PRINT_LOSS_INTERVAL = 10
+PLOT_LOSS_HISTORY = True
 ```
 
 ### Saving the Model
