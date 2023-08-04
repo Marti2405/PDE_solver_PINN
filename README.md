@@ -1,17 +1,21 @@
-# n-Dimensional PDE solver using Physics-Informed Neural Networks (PINNs) -> README
+# N-Dimensional PDE Solver Framework
+
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-brightgreen.svg)](https://github.com/Marti2405/PDE_solver_PINN)
+
+## 
 
 **Author:** Marti JIMENEZ  
 **Date:** 01/08/2023  
 **Institution:** INSA (National Institute of Applied Sciences) Toulouse, France  
-**License:** Open-source  
+**License:** MIT License 
 
 ## Introduction
 
-This repository contains a Python code to solve n-Dimensional Partial Differential Equations with Physics-Informed Neural Networks. The code leverages TensorFlow, an open-source deep learning library, to build and train the neural network. 
+This repository contains Python code to solve n-Dimensional Partial Differential Equations (PDEs) with Physics-Informed Neural Networks (PINNs). The code leverages TensorFlow, an open-source deep learning library, to build and train the neural network.
 
-Partial Differential Equations (PDEs) are fundamental in describing physical phenomena like fluid dynamics, heat conduction, and quantum mechanics. In medicine, PDEs are crucial for modeling tumor growth, drug diffusion, and biological processes. Solving complex, high-dimensional PDEs can be challenging, especially when analytical solutions are not feasible. This repository offers an efficient solution using Physics-Informed Neural Networks (PINNs) to solve n-dimensional PDEs.
+This Framework harnesses the flexibility of neural networks to efficiently approximate complex PDE solutions while incorporating known physics-based constraints, eliminating the need for large labeled datasets.
 
-PINNs can achieve accurate and robust solutions without increasing the complexity exponentially for every dimension added in the PDE like other methods (Finite Difference Method).
+Solving complex, high-dimensional PDEs can be challenging, especially when analytical solutions are not feasible. PINNs can achieve accurate and robust solutions without increasing the complexity exponentially for every dimension added in the PDE like other methods (e.g. Finite Difference Method).
 
 
 ## Dependencies
@@ -21,86 +25,177 @@ PINNs can achieve accurate and robust solutions without increasing the complexit
 - NumPy
 - Matplotlib
 
-## Code Structure
+Table of Contents
+=================
 
-The code is organized into several sections, each serving a specific purpose. Below is an overview of the major components:
-
-1. **Dimensions and Variable Boundaries:**
-
-   Specify the number of dimensions (`DIMENSIONS`) and the boundaries for each variable (`BOUNDARIES`).
-   
-2. **Define the PDE, Boundary Conditions, and Initial Conditions:** 
-
-   Set up the PDE, boundary conditions, and initial conditions. The code uses TensorFlow for symbolic differentiation to compute the residuals of the PDE and boundary conditions.
-
-3. **Data Generation:**
-
-   Create the datasets for initial conditions (`X_0`), boundary conditions (`X_b`), and PDE collocation points (`X_r`).
-
-4. **Neural Network Configuration:**
-
-   Set up the neural network architecture using TensorFlow Keras. The code uses a feedforward neural network with a configurable number of hidden layers (`NUMBER_HIDDEN_LAYERS`) and neurons per layer (`NUMBER_NEURONS_PER_LAYER`). 
-
-5. **Residuals and Loss Computation:**
-
-   Define functions to calculate the residuals of the PDE (`comp_r`), initial conditions (`comp_i`) and boundary conditions (`comp_b`) using TensorFlow automatic differentiation. The loss function (`compute_loss`) computes the mean squared error between the predicted and actual residuals.
-
-6. **Model Training:**
-
-   Train the neural network using gradient descent and backpropagation. The code uses the Adam optimizer with piecewise constant decay of learning rate.
-
-7. **Show Solution:**
-
-   Visualize the solution using matplotlib and animating the results for different time steps.
+- [How to Use](#how-to-use)
+  - [Dimensions and Variable Boundaries](#dimensions-and-variable-boundaries)
+  - [Neural Network Architecture](#neural-network-architecture)
+  - [Data-set](#data-set)
+  - [Training Parameters](#training-parameters)
+  - [Saving the Model](#saving-the-model)
+  - [PDE Loss](#pde-loss)
+  - [Initial Condition Loss](#initial-condition-loss)
+  - [Neumann Boundary Condition Loss](#neumann-boundary-condition-loss)
+  - [Dirichlet Boundary Condition Loss](#dirichlet-boundary-condition-loss)
+- [Data Preparation](#data-preparation)
+- [Neural Network Model](#neural-network-model)
+- [Loss Function](#loss-function)
+- [Training](#training)
+- [Result Visualization, Model Loading](#result-visualization-model-loading)
 
 ## How to Use
 
-To use the code, follow these steps:
+As an example, let's consider the Fisher-KPP equation in 2 dimensions:
 
-1. Install the required dependencies (TensorFlow, NumPy, Matplotlib).
+$\frac{{\partial u}}{{\partial t}} = D\left(\frac{{\partial^2 u}}{{\partial x^2}} + \frac{{\partial^2 u}}{{\partial y^2}}\right) + r \cdot u(1 - u)$
 
-2. Modify the `DIMENSIONS`, `BOUNDARIES`, and other configuration parameters as needed for your specific problem.
-
-3. Define the PDE and initial conditions in the `comp_r` and `comp_i` functions, respectively. Define the Neumann Boundary Condition by changing the `NEUMANN_BOUNDARY_CONDITION` variable.
-
-4. Run the code to train the model.
-
-    
-   **The trained Neural Network will be saved as a .h5 file in the specified path (`CHEKPOINT_PATH`)**
-
-5. You can then use `model.predict()` to predict the solution of the PDE at the given point. And you can load a saved model with `model.load_weights(CHEKPOINT_PATH)`
-
-## Model Checkpoints
-
-The trained model checkpoints are saved during training at specific iterations and can be found in the `CHEKPOINT_PATH` directory. The final trained model is saved as `CHEKPOINT_PATH_ModelTrained.h5`.
+Where \(u\) is the unknown function, \(D\) is the diffusion coefficient, and \(r\) is the growth rate.
 
 
-## Example
+### Dimensions and Variable Boundaries
 
-As an example, we are solving the Fisher-KPP equation in 2 Dimensions:
+You can define the number of dimensions of the PDE and the boundaries for each variable. For the Fisher-KPP equation, we have:
 
-$\frac{\partial u}{\partial t} = D \left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right) + r \cdot u \cdot (1 - u)$
+```python
+DIMENSIONS = 3  # Take into account the time dimension
+BOUNDARIES = [
+    [0.0, 5.0],  # Time boundaries
+    [0.0, 1.0],  # x boundaries
+    [0.0, 1.0],  # y boundaries
+    # Add more boundaries for additional dimensions if needed
+]
+```
 
-with the Initial Condition $\exp{(-\frac{(x-0.5)^2+(y-0.5)^2}{0.08})}$ and the Neumann Boundary Condition: $\nabla u \cdot n = 0$
+### Neural Network Architecture
 
-where:
-- $u = u(t, x, y)$ represents the population density of the species at time $t$ and spatial coordinates $(x, y)$.
-- $\frac{\partial u}{\partial t}$ is the time derivative of $u$, representing the rate of change of the population density with time.
-- $D$ is the diffusion coefficient, which controls the rate of diffusion or dispersal of the species in space.
-- $\frac{\partial^2 u}{\partial x^2}$ and $\frac{\partial^2 u}{\partial y^2}$ are the second partial derivatives of $u$ with respect to $x$ and $y$, respectively, representing the spatial diffusion or spread of the population.
-- $r$ is the growth rate of the species, representing how fast the population grows in the absence of spatial constraints.
-- $u \cdot (1 - u)$ is the logistic growth term, which introduces a carrying capacity effect, limiting the population growth when the population density approaches 1.
+You can customize the Neural Network architecture with the number of hidden layers, neurons per layer, and activation function.
 
-The Fisher-KPP equation is commonly used to model the spread of an advantageous trait or the invasion of a species into a new habitat. It is a classic example of a reaction-diffusion equation with a nonlinear reaction term.
+```python
+NUMBER_HIDDEN_LAYERS = 2
+NUMBER_NEURONS_PER_LAYER = 20
+ACTIVATION = tf.keras.activations.tanh
+```
 
-### Predicted Solution
-Neural Network: 4 Hidden layers of 20 Neurons
+### Data-set
 
-![Fisher KPP 1](./images/FisherKpp1.png)
+Set the number of data points for the PDE, initial condition, and boundary condition. (Please note that the number of boundary points will be multiplied by the number of dimensions)
 
-![Fisher KPP 2](./images/FisherKpp2.png)
+```python
+NUMBER_DATA_POINTS_PDE = 10000
+NUMBER_DATA_POINTS_INITIAL_CONDITION = 1000
+NUMBER_DATA_POINTS_BOUNDARY_CONDITION = 1000
+```
 
-![Fisher KPP 3](./images/FisherKpp3.png)
+### Training Parameters
+
+Define the number of training epochs, learning rates, and at which epoch you want to change the learning rate. Set the interval to print the loss during training.
+
+```python
+NUMBER_TRAINING_EPOCHS = 20000
+LEARNING_RATE = [1e-2, 5e-3, 1e-3, 5e-4, 1e-4]
+EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [2000, 5000, 12500, 17500]
+PRINT_LOSS_INTERVAL = 10
+```
+
+### Saving the Model
+
+Set the path to save the model checkpoints and the interval at which the model will be saved.
+
+```python
+CHECKPOINT_PATH = 'model_checkpoint'
+CHECKPOINT_ITERATIONS = 100
+```
+
+### PDE Loss
+
+To define the residual of the PDE, modify the return value of the function `comp_r`.
+
+The inputs of the function will be automatically computed and parsed to the function.
+- var is the list of input variables [t, x, y, z, ...]
+- u is the output of the neural network, representing the predicted value of the PDE
+- first deriv is a list containing the first derivatives [ut, ux, uy, uz , ...]
+- second deriv is a list containing the second derivatives [utt, uxx, uyy, uzz , ...]
+
+Use the necessary terms for your PDE inside this function and return the PDE residual. Here
+you can see the residual for the Fisher-KPP equation:
+```python
+def comp_r(var, u, first_deriv, second_deriv):
+    u_t = first_deriv[0] 
+    u_xx, u_yy = second_deriv[1], second_deriv[2]
+    return u_t - D*(u_xx+u_yy) - r*u*(1-u)
+```
+
+### Initial Condition Loss
+
+To define the initial condition Loss, modify the return of the function `comp_i(X)`. The input of this function is a matrix containing the initial condition points with one column per variable (starting with the time variable) `[t, x, y, z, ...]`.
+
+Here you can see the residual for the Fisher-KPP equation:
+
+```python
+def comp_i(X):
+    x = X[:, 1:2]
+    y = X[:, 2:3]
+    return tf.exp(-((x-0.5)**2 + (y-0.5)**2) / 0.08)
+```
+
+### Neumann Boundary Condition Loss
+
+To impose the Neumann boundary condition, set the variable `CHOOSE_NEUMANN_BOUNDARY_CONDITION` to `True` and set the variable `NEUMANN_BOUNDARY_CONDITION` to the desired value.
+
+Here you can see the Neumann Boundary Condition $\nabla u\cdot n =0$:
+
+```python
+CHOOSE_NEUMANN_BOUNDARY_CONDITION = True
+NEUMANN_BOUNDARY_CONDITION = 0
+```
+
+### Dirichlet Boundary Condition Loss
+
+To impose the Dirichlet boundary condition, set the variable `CHOOSE_NEUMANN_BOUNDARY_CONDITION` to `False` and modify the expected value in the `DC_comp_b(model, x_b)` function.
+
+Here you can see the Dirichlet Boundary Condition $u(t,x,y) = \sin(\pi.x)+sin(\pi.y)$:
+
+```python
+CHOOSE_NEUMANN_BOUNDARY_CONDITION = False
+
+def DC_comp_b(prediction, x_b):
+    t = x_b[:, 0:1]  # Variables
+    x = x_b[:, 1:2]  # Variables
+    y = x_b[:, 2:3]  # Variables
+    expected = tf.sin(pi*x) + tf.sin(pi*y)  # Expected output at the boundary
+    return prediction - expected
+```
+
+## Data Preparation
+
+The framework generates the wanted number of data points for initial conditions, boundary conditions, and PDE data.
+
+## Neural Network Model
+
+The framework initializes the Neural Network model with the specified architecture and compiles it with an Adam optimizer using the defined learning rates.
+
+## Loss Function
+
+The loss function combines three components: PDE residual loss, boundary condition residual loss, and initial condition loss. The PDE residual loss is obtained by computing the residuals of the PDE equation using the neural network's predicted values and their derivatives. The boundary condition residual loss ensures that the neural network satisfies the boundary conditions. The initial condition loss enforces the initial condition.
+
+## Training
+
+The model is trained using Adam optimizer. The loss is computed using the three components mentioned above. During training, the model parameters are updated to minimize the loss.
+
+## Result Visualization, Model Loading
+
+After training, the model is saved. You can use the model to predict the PDE solution by calling `model.predict(X)` with `X` representing the desired points. (There is an example in the code to show the solution of the 2D Fisher-KPP equation).
+
+To load a model, you have to initialize a model with the same neural network architecture 
+```
+model1 = init_model()
+``` 
+and then load the weights previously saved in a .h5 file 
+```
+model1.load_weights(filepath.h5)
+```
+
 
 
 ## License
@@ -118,4 +213,4 @@ Feel free to reach out to the author if you have any questions or need further a
 
 If you use this code in your research work, please cite the following paper:
 
-[Insert citation for the relevant paper here]
+[Working...]
