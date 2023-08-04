@@ -18,12 +18,6 @@
 ########################################################################################
 
 
-
-
-
-"""###########################################################################"""
-"""######################## Define the PDE, BC and IC ########################"""
-
 ######################## Imports ########################
 import tensorflow as tf
 import numpy as np
@@ -32,6 +26,10 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 #########################################################
 
+
+
+"""###########################################################################"""
+"""######################## Define the PDE, BC and IC ########################"""
 
 
 ######################## DIMENSIONS AND VARIABLE BOUNDARIES ########################
@@ -47,18 +45,34 @@ BOUNDARIES = [
 
 
 ######################## NEURAL NETWORK ########################
-NUMBER_HIDDEN_LAYERS = 4 # number of hidden layers in the neural network
+NUMBER_HIDDEN_LAYERS = 2 # number of hidden layers in the neural network
 NUMBER_NEURONS_PER_LAYER = 20 # number of neurons per hidden layer
 ACTIVATION = tf.keras.activations.tanh # activation function
+##################################################################
+
+
+
+######################## DATA POINTS ########################
 NUMBER_DATA_POINTS_PDE = 10000 # number of random data points
 NUMBER_DATA_POINTS_INITIAL_CONDITION = 1000 # number of random initial condition data points
 NUMBER_DATA_POINTS_BOUNDARY_CONDITION = 1000 # number of random boundary condition data points
+##################################################################
+
+
+
+######################## TRAINING ########################
 NUMBER_TRAINING_EPOCHS = 20000 # number of training iterations
 LEARNING_RATE = [1e-2,5e-3,1e-3,5e-4,1e-4] # learning rates of the NN
-EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [2000,5000,12500,17500] # at which iteration to change the learning rate
+EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [1800,5000,12500,17500] # at which iteration to change the learning rate
 PRINT_LOSS_INTERVAL = 10 # print the loss every PRINT_LOSS_INTERVAL training steps
+PLOT_LOSS_HISTORY = True # boolean to plot or not plot the loss history after training
+##################################################################
+
+
+
+######################## SAVING THE MODEL ########################
 CHEKPOINT_PATH = 'model_checkpoint' #path to save the model
-CHECKPOINT_ITERATIONS = 1000 # save the model each CHECKPOINT_ITERATIONS iterations
+CHECKPOINT_ITERATIONS = 10000 # save the model each CHECKPOINT_ITERATIONS iterations
 ##################################################################
 
 
@@ -66,7 +80,6 @@ CHECKPOINT_ITERATIONS = 1000 # save the model each CHECKPOINT_ITERATIONS iterati
 ######################## DATA TYPE ########################
 DTYPE='float32' # Set data type
 tf.keras.backend.set_floatx(DTYPE)
-PLOT_LOSS_HISTORY = True # boolean to plot or not plot the loss history after training
 ###########################################################
 
 
@@ -87,8 +100,25 @@ def comp_i(X):
 
 
 
-######################## Define Neumann boundary condition ########################
+######################## Define the boundary condition ########################
+CHOOSE_NEUMANN_BOUNDARY_CONDITION = True # if true->Neumann BC,   if false->Dirichlet BC
+
+######################## NEUMANN BOUNDARY CONDITION ########################
 NEUMANN_BOUNDARY_CONDITION = 0 # the Neumann BC
+
+
+######################## DIRICHLET BOUNDARY CONDITION ########################
+def DC_comp_b(prediction, x_b):
+
+    # variables
+    t = x_b[:,0:1]
+    x = x_b[:,1:2]
+    y = x_b[:,2:3]
+
+    expected = tf.sin(pi*x)+tf.sin(pi*y) # expected output at the boundary
+
+    return prediction - expected 
+
 
 
 
@@ -110,8 +140,8 @@ def comp_r(var, u, first_deriv, second_deriv):
 
 
 ######################## YOU DON'T NEED TO MODIFY THIS FUNCTION ########################
-######################## residual of boundary condition ########################
-def comp_b(var, first_derivatives, lower_boundary, upper_boundary):
+######################## residual of neumann boundary condition ########################
+def NBC_comp_b(var, first_derivatives, lower_boundary, upper_boundary):
 
     neumann_boundary_condition = NEUMANN_BOUNDARY_CONDITION
 
@@ -230,6 +260,8 @@ def init_model(num_hidden_layers=NUMBER_HIDDEN_LAYERS, num_neurons_per_layer=NUM
 
     return model
 
+
+
 """########################################################################"""
 """######################## Residual, Loss, Gradient loss #################""" 
 
@@ -276,39 +308,44 @@ def get_r(model, X_r):
 
 
 ################ Get residual of boundary condition ################
-def get_b_r(model ,X_b):
+def get_b_r(model ,x_b):
     
+    if CHOOSE_NEUMANN_BOUNDARY_CONDITION==False: # if we have Dirichlet Boundary Condition
+        prediction = model(x_b)
+        return DC_comp_b(prediction,x_b)
     
-    # Compute the derivatives
-    with tf.GradientTape(persistent=True) as tape: # A tf.GradientTape is used to compute derivatives in TensorFlow
-        
-        # split variables to compute partial derivatives
-        variables = []
-        for i in range(DIMENSIONS):
-            variables.append(X_b[:,i:i+1])
+    else:
+        # Compute the derivatives
+        with tf.GradientTape(persistent=True) as tape: # A tf.GradientTape is used to compute derivatives in TensorFlow
+            
+            # split variables to compute partial derivatives
+            variables = []
+            for i in range(DIMENSIONS):
+                variables.append(x_b[:,i:i+1])
 
-        # watch variables
-        for i in range(DIMENSIONS):
-            tape.watch(variables[i])
+            # watch variables
+            for i in range(DIMENSIONS):
+                tape.watch(variables[i])
 
-        
-        
-        stack = [] # stack the variables to feed the model
-        for i in range(DIMENSIONS):
-            stack.append(variables[i][:,0]) # addd to list to stack, drop the second dimension
-        
-        # Determine residual
-        u = model(tf.stack(stack, axis=1))
-         
-    # Compute the first gradients
-    first_derivatives = [0] # remove the 0 and start the loop from 0 if you also need the time derivative
-    for i in range(1,DIMENSIONS): # we skip the derivative of time since we don't need it for boundary contitions
-        first_derivatives.append(tape.gradient(u, variables[i]))
+            
+            
+            stack = [] # stack the variables to feed the model
+            for i in range(DIMENSIONS):
+                stack.append(variables[i][:,0]) # addd to list to stack, drop the second dimension
+            
+            # Determine residual
+            u = model(tf.stack(stack, axis=1))
+            
+        # Compute the first gradients
+        first_derivatives = [0] # remove the 0 and start the loop from 0 if you also need the time derivative
+        for i in range(1,DIMENSIONS): # we skip the derivative of time since we don't need it for boundary contitions
+            first_derivatives.append(tape.gradient(u, variables[i]))
 
 
-    del tape
+        del tape
 
-    return comp_b(variables,first_derivatives,lb,ub) 
+
+        return NBC_comp_b(variables,first_derivatives,lb,ub) 
 
 
 
@@ -335,6 +372,7 @@ def compute_loss(model, x_r, x_b, x_0):
     i = get_i_r(model, x_0)
     phi_0 = tf.reduce_mean(tf.square(i))
 
+    
     # Initialize loss
     loss = phi_r + phi_b + phi_0
 
@@ -375,7 +413,6 @@ lr = tf.keras.optimizers.schedules.PiecewiseConstantDecay(EPOCH_CHECKPOINTS_CHAN
 # Choose the optimizer
 optim = tf.keras.optimizers.Adam(learning_rate=lr)
 
-
 # Define one training 
 @tf.function # Defining the training step as a tensorflow function will increase the speed of training and optimize the memory used
 def train_step(optimizer):
@@ -401,11 +438,13 @@ t0 = time.time()
 # print model summary
 model.summary()
 
+
 ################ For each training step ################
 for i in range(N+1):
-
+    
     # training step
     loss = train_step(optim)
+
 
     # Append current loss to hist
     hist.append(loss.numpy())
@@ -414,7 +453,7 @@ for i in range(N+1):
     if i%PRINT_LOSS_INTERVAL == 0:
         print('It {:05d}: loss = {:10.8e}'.format(i,loss))
     # save model checkpoint
-    if i%CHECKPOINT_ITERATIONS==0 and i!=N:
+    if i%CHECKPOINT_ITERATIONS==0 and i!=N and i!=0:
         model.save(f'{checkpoint_filepath}_{i}.h5')
         print(f'Model iter[{i}] saved in file {checkpoint_filepath}{i}.h5')
 
@@ -434,14 +473,14 @@ if PLOT_LOSS_HISTORY:
     plt.ylabel("loss")
     plt.yscale('log')
     plt.show()
-    
 
+
+    
 
 
 """########################################################################"""
 """######################## Show Solution #################################"""
 """ 2D time dependent plot """
-""" See the Jupyter Notebook for the Interactive Slider Plot example """
 
 
 timesplit = 30 # number of plots in the time interval
