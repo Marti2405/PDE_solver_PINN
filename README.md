@@ -1,4 +1,4 @@
-# N-Dimensional PDE Solver Framework
+# N-Dimensional Partial Differential Equation (PDE) Solver with Physics-Informed Neural Networks (PINNs)
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-brightgreen.svg)](https://github.com/Marti2405/PDE_solver_PINN)
 
