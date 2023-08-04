@@ -49,6 +49,7 @@ BOUNDARIES = [
 ######################## NEURAL NETWORK ########################
 NUMBER_HIDDEN_LAYERS = 4 # number of hidden layers in the neural network
 NUMBER_NEURONS_PER_LAYER = 20 # number of neurons per hidden layer
+ACTIVATION = tf.keras.activations.tanh # activation function
 NUMBER_DATA_POINTS_PDE = 10000 # number of random data points
 NUMBER_DATA_POINTS_INITIAL_CONDITION = 1000 # number of random initial condition data points
 NUMBER_DATA_POINTS_BOUNDARY_CONDITION = 1000 # number of random boundary condition data points
@@ -57,7 +58,7 @@ LEARNING_RATE = [1e-2,5e-3,1e-3,5e-4,1e-4] # learning rates of the NN
 EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [2000,5000,12500,17500] # at which iteration to change the learning rate
 PRINT_LOSS_INTERVAL = 10 # print the loss every PRINT_LOSS_INTERVAL training steps
 CHEKPOINT_PATH = 'model_checkpoint' #path to save the model
-CHECKPOINT_ITERATIONS = 100 # save the model each CHECKPOINT_ITERATIONS iterations
+CHECKPOINT_ITERATIONS = 1000 # save the model each CHECKPOINT_ITERATIONS iterations
 ##################################################################
 
 
