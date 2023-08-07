@@ -61,9 +61,7 @@ NUMBER_DATA_POINTS_BOUNDARY_CONDITION = 1000 # number of random boundary conditi
 
 
 ######################## TRAINING ########################
-NUMBER_TRAINING_EPOCHS = 20000 # number of training iterations
-LEARNING_RATE = [1e-2,5e-3,1e-3,5e-4,1e-4] # learning rates of the NN
-EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE = [1800,5000,12500,17500] # at which iteration to change the learning rate
+NUMBER_TRAINING_EPOCHS = 10000 # number of training iterations
 PRINT_LOSS_INTERVAL = 10 # print the loss every PRINT_LOSS_INTERVAL training steps
 PLOT_LOSS_HISTORY = True # boolean to plot or not plot the loss history after training
 ##################################################################
@@ -244,7 +242,7 @@ def init_model(num_hidden_layers=NUMBER_HIDDEN_LAYERS, num_neurons_per_layer=NUM
     # Input 
     model.add(tf.keras.Input(DIMENSIONS))
 
-    # Introduce a scaling layer to map [lb, ub] to [0,1]
+    # Scaling layer to map [lb, ub] to [0,1]
     scaling_layer = tf.keras.layers.Lambda(
                 lambda x: (x - lb)/(ub - lb))
     model.add(scaling_layer)
@@ -255,7 +253,7 @@ def init_model(num_hidden_layers=NUMBER_HIDDEN_LAYERS, num_neurons_per_layer=NUM
             activation=ACTIVATION,
             kernel_initializer='glorot_normal'))
 
-    # Output is one-dimensional
+    # Output
     model.add(tf.keras.layers.Dense(1))
 
     return model
@@ -407,11 +405,8 @@ checkpoint_filepath = CHEKPOINT_PATH
 model = init_model()
 
 
-# Piecewise decay of the learning rate
-lr = tf.keras.optimizers.schedules.PiecewiseConstantDecay(EPOCH_CHECKPOINTS_CHANGE_LEARNING_RATE,LEARNING_RATE)
-
 # Choose the optimizer
-optim = tf.keras.optimizers.Adam(learning_rate=lr)
+optim = tf.keras.optimizers.Adam()
 
 # Define one training 
 @tf.function # Defining the training step as a tensorflow function will increase the speed of training and optimize the memory used
