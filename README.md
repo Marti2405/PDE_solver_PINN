@@ -208,8 +208,4 @@ This code is developed by Marti JIMENEZ as part of research conducted at the Lab
 
 Feel free to reach out to the author if you have any questions or need further assistance with the code.
 
-## Citation
 
-If you use this code in your research work, please cite the following paper:
-
-[Working...]
