@@ -264,7 +264,7 @@ def init_model(num_hidden_layers=NUMBER_HIDDEN_LAYERS, num_neurons_per_layer=NUM
 """######################## Residual, Loss, Gradient loss #################""" 
 
 ################ Get residual of PDE ################
-def get_r(model, X_r):
+def get_r(model, X_r): # X_r is the random variables generated for all the involved spaces (e.g. totally 10000 points in the n dim space )
 
     # Compute derivatives
     with tf.GradientTape(persistent=True) as tape: # A tf.GradientTape is used to compute derivatives in TensorFlow
