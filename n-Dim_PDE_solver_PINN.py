@@ -251,7 +251,7 @@ def init_model(num_hidden_layers=NUMBER_HIDDEN_LAYERS, num_neurons_per_layer=NUM
     for _ in range(num_hidden_layers):
         model.add(tf.keras.layers.Dense(num_neurons_per_layer,
             activation=ACTIVATION,
-            kernel_initializer='glorot_normal'))
+            kernel_initializer='glorot_normal')) # glorot_normal for uniformly genrated random numbers for weights initialization
 
     # Output
     model.add(tf.keras.layers.Dense(1))
