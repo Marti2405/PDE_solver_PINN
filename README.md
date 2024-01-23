@@ -6,7 +6,6 @@
 
 **Author:** Marti JIMENEZ  
 **Date:** 01/08/2023  
-**Institution:** INSA (National Institute of Applied Sciences) Toulouse, France  
 **License:** MIT License 
 
 ## Introduction
